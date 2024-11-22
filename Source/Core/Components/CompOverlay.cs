@@ -24,7 +24,7 @@ namespace GiddyUp
 			//support multi texture animals
             if (overlay.allVariants != null)
             {
-                string graphicPath = pawn.Drawer?.renderer?.graphics?.nakedGraphic?.path;
+                string graphicPath = pawn.Drawer?.renderer?.SilhouetteGraphic?.path;
 				if (graphicPath.NullOrEmpty()) return;
                 string graphicName = graphicPath.Split('/').Last();
                 bool found = false;

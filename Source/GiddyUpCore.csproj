@@ -2,8 +2,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Product>Giddy-Up</Product>
-		<AssemblyVersion>2.0.85</AssemblyVersion>
-		<Version>1.4</Version>
+		<AssemblyVersion>2.1.1</AssemblyVersion>
+		<Version>1.5</Version>
 		<Copyright>$([System.DateTime]::Now.ToString('yyyy'))</Copyright>
 		<Company>Owlchemist</Company>
 		<TargetFramework>net48</TargetFramework>
@@ -11,18 +11,28 @@
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<OutputPath>..\..\..\Mods\$(Product)\$(Version)\Assemblies</OutputPath>
+		<OutputPath>..\ModFolder\$(Version)\Assemblies</OutputPath>
 		<DefineConstants>TRACE;NDEBUG</DefineConstants>
 		<WarningLevel>4</WarningLevel>
 		<DebugSymbols>false</DebugSymbols>
 		<DebugType>None</DebugType>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<OutputPath>..\..\..\Mods\$(Product)\$(Version)\Assemblies</OutputPath>
+		<OutputPath>..\ModFolder\$(Version)\Assemblies</OutputPath>
 		<DefineConstants>TRACE;DEBUG;NETFRAMEWORK;NET48;</DefineConstants>
 	</PropertyGroup>
+
+	<Target Name="CopyCustomContent" AfterTargets="AfterBuild">
+		<ItemGroup>
+			<ModFolder Include="..\ModFolder\**\*" />
+		</ItemGroup>
+		
+		<!--Destination folder should your Rimworld mod folder (by default, will use \Program Files (x86)\Steam\steamapps\common\RimWorld\Mods)-->
+		<Copy SourceFiles="@(ModFolder)" DestinationFolder="$(MSBuildProgramFiles32)\Steam\steamapps\common\RimWorld\Mods\$(Product)\%(RecursiveDir)" />
+	</Target>
+	
 	<ItemGroup>
-		<PackageReference Include="Krafs.Publicizer" Version="2.*">
+		<PackageReference Include="Krafs.Publicizer" Version="2.2.1">
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
@@ -31,7 +41,7 @@
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
-		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.4.*" />
+		<PackageReference Include="Krafs.Rimworld.Ref" Version="1.5.*" />
 		<!-- <PackageReference Include="RimWorld.MultiplayerAPI" Version="0.4.0" /> -->
 	</ItemGroup>
 	<ItemGroup>

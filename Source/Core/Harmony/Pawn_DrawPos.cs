@@ -1,9 +1,9 @@
 ﻿using HarmonyLib;
 using UnityEngine;
-using Verse;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using System.Linq;
+using Verse;
 using Settings = GiddyUp.ModSettings_GiddyUp;
 
 namespace GiddyUp.Harmony
@@ -13,34 +13,23 @@ namespace GiddyUp.Harmony
     {
         static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
-            var label = generator.DefineLabel();
-            var label2 = generator.DefineLabel();
-            bool foundLabelOneSpot = false;
-            int numofCodes = instructions.Count();
-            foreach (var code in instructions)
-            {
-                if (!foundLabelOneSpot && code.opcode == OpCodes.Ldarg_0)
-                {
-                    code.labels.Add(label);
-                    foundLabelOneSpot = true;
-                }
-                if (numofCodes-- == 2) //Returns 1 line before the ret at the end
-                {
-                    code.labels.Add(label2);
-                    break;
-                }
-            }
+            var firstLdArg0Label = generator.DefineLabel();
+            var firstLdArg0 = instructions.First(i => i.opcode == OpCodes.Ldarg_0);
+            firstLdArg0.labels.Add(firstLdArg0Label);
+
+            var returnInstructionLabel = generator.DefineLabel();
+            var returnInstruction = instructions.ToList()[instructions.Count() - 1];
+            returnInstruction.labels.Add(returnInstructionLabel);
 
             yield return new CodeInstruction(OpCodes.Ldsfld, AccessTools.Field(typeof(ExtendedDataStorage), nameof(ExtendedDataStorage.isMounted)));
             yield return new CodeInstruction(OpCodes.Ldarg_0);
             yield return new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(Pawn_DrawTracker), nameof(Pawn_DrawTracker.pawn)));
             yield return new CodeInstruction(OpCodes.Ldfld, AccessTools.Field(typeof(Thing), nameof(Thing.thingIDNumber)));
             yield return new CodeInstruction(OpCodes.Callvirt, typeof(HashSet<int>).GetMethod(nameof(HashSet<int>.Contains)));
-            yield return new CodeInstruction(OpCodes.Brfalse_S, label);
+            yield return new CodeInstruction(OpCodes.Brfalse_S, firstLdArg0Label);
             yield return new CodeInstruction(OpCodes.Ldarg_0);
             yield return new CodeInstruction(OpCodes.Call, typeof(Pawn_DrawTracker_DrawPos).GetMethod(nameof(Pawn_DrawTracker_DrawPos.DrawOffset)));
-            yield return new CodeInstruction(OpCodes.Stloc_0);
-            yield return new CodeInstruction(OpCodes.Br_S, label2);
+            yield return new CodeInstruction(OpCodes.Br_S, returnInstructionLabel);
 
             foreach (var code in instructions) yield return code;
         }

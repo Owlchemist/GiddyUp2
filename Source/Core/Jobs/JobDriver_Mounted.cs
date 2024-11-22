@@ -66,7 +66,6 @@ namespace GiddyUp.Jobs
 							(curJobDef != ResourceBank.JobDefOf.Mount && 
 							curJobDef != JobDefOf.Vomit && 
 							curJobDef != JobDefOf.Wait_MaintainPosture && 
-							curJobDef != JobDefOf.SocialRelax && 
 							curJobDef != JobDefOf.Wait && 
 							riderData.mount == null) ||
 							//Rider is cheating on this mount and went with another
